@@ -25,10 +25,20 @@ const cnn = mysql.createConnection({
 cnn.connect(err => {
     if (err) {
         console.error('MySQL 연결 실패:', err);
-        return;
+        setTimeout(() => handleDisconnect(), 2000); // 2초 후 재연결 시도
+    } else {
+        console.log('MySQL 연결 성공');
     }
-    console.log('MySQL 연결 성공');
 });
+
+function handleDisconnect() {
+    cnn.connect(err => {
+        if (err) {
+            console.error('MySQL 연결 실패:', err);
+            setTimeout(handleDisconnect, 2000); // 재연결
+        }
+    });
+}
 
 // 미들웨어 설정
 app.use(bodyParser.urlencoded({ extended: true }));
